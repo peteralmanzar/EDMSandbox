@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="AppHost1/AppHost1.csproj" />
+  <Project Path="FunctionApp1/FunctionApp1.csproj" />
+  <Project Path="ServiceDefaults1/ServiceDefaults1.csproj" />
+</Solution>
