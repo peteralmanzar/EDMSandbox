@@ -33,8 +33,8 @@ internal class Program
             .WithUrl($"https://localhost:5001/_explorer/index.html", "CosmosDb Explorer");
 
         // Cosmos DB database and container
-        var cosmosDbDatabase = cosmosDb.AddCosmosDatabase("cosmosDb-Database");
-        cosmosDbDatabase.AddContainer("cosmosDb-Container", "/id");
+        var cosmosDbDatabase = cosmosDb.AddCosmosDatabase("cosmosDbDatabase");
+        cosmosDbDatabase.AddContainer("cosmosDbContainer", "/id");
 
         var eventHub = eventHubs.AddHub("messages");
 
@@ -47,6 +47,8 @@ internal class Program
             .WithReference(eventHub, "EDMEventHub")
             .WithReference(cosmosDb, connectionName: "CosmosDbConnection")
             .WithEnvironment("AzureWebJobsStorage", function1_AzureWebJobsStorage)
+            .WithEnvironment("cosmosDbDatabase", "cosmosDbDatabase")
+            .WithEnvironment("cosmosDbContainer", "cosmosDbContainer")
             .WithEnvironment("Logging__LogLevel__Default", "Debug")                             // uncomment for verbose logging
             .WithEnvironment("Logging__LogLevel__Microsoft", "Debug");                           // uncomment for verbose logging
 

@@ -12,6 +12,7 @@ public class EventHubWriterFunction(ILoggerFactory loggerFactory)
     public EdmEvent Run([TimerTrigger("0 */1 * * * *", RunOnStartup = true)] TimerInfo timerInfo)
     {
         var result = EdmEventGenerator.Faker.Generate();
+        _logger.LogInformation("{User} said: {Message}", result.Name, result.Message);
         return result;
     }
 }
