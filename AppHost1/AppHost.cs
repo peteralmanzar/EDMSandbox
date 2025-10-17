@@ -1,3 +1,5 @@
+using Aspire.Hosting.ApplicationModel;
+
 internal class Program
 {
     private static void Main(string[] args)
@@ -19,36 +21,19 @@ internal class Program
             });
 
         // cosmos db
-        var cosmosDb = builder.AddAzureCosmosDB("cosmos-db")
-            .RunAsEmulator(emulator =>
-            {
-                emulator.WithContainerName("EDMSandbox-CosmosDb");
-
-                emulator
-                    .WithGatewayPort(5001)
-                    .WithLifetime(ContainerLifetime.Persistent)
-                    .WithPartitionCount(5)
-                    .WithDataVolume("EDMSandbox-CosmosDb-Volume");
-            })
-            .WithUrl($"https://localhost:5001/_explorer/index.html", "CosmosDb Explorer");
-
-        // Cosmos DB database and container
-        var cosmosDbDatabase = cosmosDb.AddCosmosDatabase("cosmosDbDatabase");
-        cosmosDbDatabase.AddContainer("cosmosDbContainer", "/id");
-
-        var eventHub = eventHubs.AddHub("messages");
+        var LocalCosmosDbEmulatorService = builder.AddConnectionString("localCosmosDbEmulator");
 
         // Function App
+        var eventHub = eventHubs.AddHub("messages");
         var function1_AzureWebJobsStorage = azureStorage.AddBlobs($"function1-AzureWebJobsStorage");
         builder.AddProject<Projects.FunctionApp1>("FuncitonApp")
             .WaitFor(eventHubs)
             .WaitFor(function1_AzureWebJobsStorage)
-            .WaitFor(cosmosDb)
             .WithReference(eventHub, "EDMEventHub")
-            .WithReference(cosmosDb, connectionName: "CosmosDbConnection")
+            .WithReference(LocalCosmosDbEmulatorService, connectionName: "CosmosDbConnection")
             .WithEnvironment("AzureWebJobsStorage", function1_AzureWebJobsStorage)
-            .WithEnvironment("cosmosDbDatabase", "cosmosDbDatabase")
-            .WithEnvironment("cosmosDbContainer", "cosmosDbContainer")
+            .WithEnvironment("cosmosDbDatabase", "associate-app-azure-cosmosdb-database")
+            .WithEnvironment("cosmosDbContainer", "Assignments")
             .WithEnvironment("Logging__LogLevel__Default", "Debug")                             // uncomment for verbose logging
             .WithEnvironment("Logging__LogLevel__Microsoft", "Debug");                           // uncomment for verbose logging
 
